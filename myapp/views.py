@@ -10,11 +10,19 @@ TOTAL_PHONES = 14_591+1
 def home(request):
     print(PhoneSpec.objects.count(),NoPhone.objects.count())
     print([n.number for n in NoPhone.objects.all()])
-    q=request.GET.get('q','')
+    q = request.GET.get("q", "").strip()
+    qs = PhoneSpec.objects.none()
     if q:
-        qs = PhoneSpec.objects.filter(title__icontains=q)
-        return HttpResponse(','.join([f"<a href='/{i.number}/'>{i.number}</a>" for i in qs]))
-    return HttpResponse('<a href="/parse/">parse scrapped pages</a> | <a href="/download/">image download</a><hr/><form><input name="q"/><input type="submit"/></form>')
+        qs = PhoneSpec.objects.filter(title__icontains=q).order_by("number")
+    return render(
+        request,
+        "home.html",
+        {
+            "q": q,
+            "results": qs,
+            "result_count": qs.count() if q else 0,
+        },
+    )
 
 def download_images(request):
     import os,requests
