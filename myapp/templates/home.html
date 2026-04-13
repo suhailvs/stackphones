@@ -47,6 +47,18 @@
     border: none;
   }
 
+  .filter-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    background: #fff;
+    padding: 12px 14px;
+  }
+
+  .range-value {
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+  }
+
   .result-count {
     font-size: 0.95rem;
     color: var(--muted);
@@ -118,15 +130,18 @@
           </p>
         </div>
         <div class="col-md-5">
-          <form class="d-flex gap-2" method="get">
-            <input
-              class="form-control search-input"
-              type="text"
-              name="q"
-              placeholder="Search e.g. Galaxy S21"
-              value="{{ q }}"
-            />
-            <button class="btn btn-primary search-btn" type="submit">Search</button>
+          <form class="d-grid gap-3" method="get">
+            <div class="d-flex gap-2">
+              <input
+                class="form-control search-input"
+                type="text"
+                name="q"
+                placeholder="Search e.g. Galaxy S21"
+                value="{{ q }}"
+              />
+              <button class="btn btn-primary search-btn" type="submit">Search</button>
+            </div>
+            
           </form>
         </div>
       </div>
@@ -193,6 +208,53 @@
     </div>
     {% endfor %}
   </div>
+
+  {% if page_obj and page_obj.paginator.num_pages > 1 %}
+  <nav class="mt-4" aria-label="Results pages">
+    <ul class="pagination justify-content-center">
+      <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+        {% if page_obj.has_previous %}
+        <a
+          class="page-link"
+          href="?{% if q %}q={{ q|urlencode }}&{% endif %}{% if has_weight_filter %}min_weight={{ min_weight|floatformat:0 }}&max_weight={{ max_weight|floatformat:0 }}&{% endif %}page={{ page_obj.previous_page_number }}"
+          aria-label="Previous"
+        >
+          Prev
+        </a>
+        {% else %}
+        <span class="page-link">Prev</span>
+        {% endif %}
+      </li>
+      {% for num in page_range %}
+      {% if num == "…" %}
+      <li class="page-item disabled"><span class="page-link">…</span></li>
+      {% else %}
+      <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+        <a
+          class="page-link"
+          href="?{% if q %}q={{ q|urlencode }}&{% endif %}{% if has_weight_filter %}min_weight={{ min_weight|floatformat:0 }}&max_weight={{ max_weight|floatformat:0 }}&{% endif %}page={{ num }}"
+        >
+          {{ num }}
+        </a>
+      </li>
+      {% endif %}
+      {% endfor %}
+      <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+        {% if page_obj.has_next %}
+        <a
+          class="page-link"
+          href="?{% if q %}q={{ q|urlencode }}&{% endif %}{% if has_weight_filter %}min_weight={{ min_weight|floatformat:0 }}&max_weight={{ max_weight|floatformat:0 }}&{% endif %}page={{ page_obj.next_page_number }}"
+          aria-label="Next"
+        >
+          Next
+        </a>
+        {% else %}
+        <span class="page-link">Next</span>
+        {% endif %}
+      </li>
+    </ul>
+  </nav>
+  {% endif %}
 
   <div class="text-center text-muted small mt-5">
     <a class="text-muted" href="/parse/">parse scrapped pages</a>

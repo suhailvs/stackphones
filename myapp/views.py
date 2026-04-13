@@ -1,5 +1,6 @@
 import time
 from django.shortcuts import get_object_or_404, render
+from django.core.paginator import Paginator
 from django.conf import settings
 from django.http import HttpResponse
 from django.views import View
@@ -11,16 +12,26 @@ def home(request):
     print(PhoneSpec.objects.count(),NoPhone.objects.count())
     print([n.number for n in NoPhone.objects.all()])
     q = request.GET.get("q", "").strip()
-    qs = PhoneSpec.objects.none()
+    qs = PhoneSpec.objects.all()
     if q:
-        qs = PhoneSpec.objects.filter(title__icontains=q).order_by("number")
+        qs = qs.filter(title__icontains=q)
+
+    paginator = Paginator(qs.order_by("-number"), 24)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    page_range = paginator.get_elided_page_range(
+        page_obj.number, on_each_side=2, on_ends=1
+    )
+
     return render(
         request,
         "home.html",
         {
             "q": q,
-            "results": qs,
+            "results": page_obj,
             "result_count": qs.count() if q else 0,
+            "page_obj": page_obj,
+            "page_range": page_range,
         },
     )
 
