@@ -10,8 +10,8 @@ from .utils import save_phone_spec
 
 TOTAL_PHONES = 14_591+1
 def home(request):
-    print(PhoneSpec.objects.count(),NoPhone.objects.count())
-    print([n.number for n in NoPhone.objects.all()])
+    # print(PhoneSpec.objects.count(),NoPhone.objects.count())
+    # print([n.number for n in NoPhone.objects.all()])
     q = request.GET.get("q", "").strip()
     qs = PhoneSpec.objects.all()
     if q:

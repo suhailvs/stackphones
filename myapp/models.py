@@ -3,8 +3,8 @@ from django.urls import reverse
 from django.utils.text import slugify
 
 class PhoneSpec(models.Model):
-    number = models.IntegerField(unique=True)
-    title = models.CharField(max_length=200, blank=True)
+    number = models.IntegerField(unique=True,db_index=True)
+    title = models.CharField(max_length=200, blank=True,db_index=True)
     image = models.URLField(max_length=500, blank=True)
     # Network
     network_technology = models.CharField(max_length=100, blank=True)
