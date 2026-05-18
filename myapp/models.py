@@ -90,8 +90,3 @@ class PhoneSpec(models.Model):
         slug = slugify(self.title).replace("-", "_")
         return reverse("phone-detail",kwargs={"slug": slug,"n": self.number})
     
-class NoPhone(models.Model):
-    number = models.IntegerField(unique=True)
-    error = models.TextField()
-    def __str__(self):
-        return self.number

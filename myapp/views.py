@@ -5,13 +5,11 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.views import View
 from django.utils.text import slugify
-from .models import PhoneSpec, NoPhone
+from .models import PhoneSpec
 from .utils import save_phone_spec
 
 TOTAL_PHONES = 14_673
 def home(request):
-    # print(PhoneSpec.objects.count(),NoPhone.objects.count())
-    # print([n.number for n in NoPhone.objects.all()])
     q = request.GET.get("q", "").strip()
     qs = PhoneSpec.objects.all()
     if q:
@@ -73,43 +71,33 @@ def download_images(request):
 
 def parse(request):
     start = time.perf_counter()
-    NoPhone.objects.all().delete() # if NoPhone uncommeted it will take about
     FD = settings.BASE_DIR / 'scraped_pages'
     phonespec_list = []
-    nophone_list = []
     created_phone_count = 0
     existing_numbers = set(PhoneSpec.objects.values_list("number", flat=True))
-    existing_numbers.update(NoPhone.objects.values_list("number", flat=True))
-
     for i in range(1, TOTAL_PHONES+1):
         if i in existing_numbers:
             continue
         path = FD / f"{i}.html"
         if not path.exists():
-            nophone_list.append(NoPhone(number=i, error="File not found"))
             continue
         try:
             html = path.read_text(encoding="utf-8", errors="ignore")
         except Exception as e:
-            nophone_list.append(NoPhone(number=i,error=str(e)))
             continue
         try:
             data = save_phone_spec(html)
         except Exception as e:
-            nophone_list.append(NoPhone(number=i,error=str(e)))
             continue
         phonespec_list.append(PhoneSpec(number=i, **data,))
         if i%500==0:
             print('going to bulk create at ',i)
-            if nophone_list:NoPhone.objects.bulk_create(nophone_list)
             if phonespec_list:
                 before = PhoneSpec.objects.count()
                 PhoneSpec.objects.bulk_create(phonespec_list)
                 created_phone_count += PhoneSpec.objects.count() - before
             phonespec_list.clear()
-            nophone_list.clear()          
-            print('-')
-    if nophone_list:NoPhone.objects.bulk_create(nophone_list)
+            print('bulk create completed')
     if phonespec_list:
         before = PhoneSpec.objects.count()
         PhoneSpec.objects.bulk_create(phonespec_list)

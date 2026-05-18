@@ -2,12 +2,37 @@
 
 ## Add New Phones
 
-on local:
-1. scrap: update **START** and **END** in `t.py`, then run: `python t.py`
-2. update db: update **TOTAL_PHONES** in `views.py`, then click `parse scrapped pages` then click `image download`
-3. move those images and scraped_pages to stackschools_datas
+### 1. Scrape New Phones
 
-### Setup
+On your local machine:
+
+* Update `START` and `END` values in `t.py`
+* Run:
+
+```bash
+python t.py
+```
+* Backup New Files
+
+Copy newly added files from: `scraped_pages/` to <https://github.com/suhailvs/stackschools_datas>
+
+---
+
+### 2. Parse Data and Download Images
+
+* Update `TOTAL_PHONES` in `views.py`
+* Ensure `scraped_pages/` folder exist in the project root:
+* Make sure previously downloaded images are present inside `scraped_pages/images/`
+
+Then:
+
+1. Open the website(https://stackphones.com or http://localhost:8000), at the bottom of the page:
+2. Click **parse scraped pages**
+   * For a fresh database, this may take around 9 minutes
+3. Click **image download**
+4. Copy newly added images from `scraped_pages/images/` to <https://github.com/suhailvs/stackschools_datas> and `media` folder.
+
+## Local Setup
 
 ```bash
 cp .env.sample .env
@@ -15,7 +40,7 @@ cp .env.sample .env
 ```
 
 
-### Similar WEB
+## Similar WEB
 
 + Global Rank: 817 
 + Total visits: 50M 
