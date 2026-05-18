@@ -22,6 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('parse/', views.parse),
     path('download/', views.download_images),
-    
-    path("<int:n>/", views.PhoneDetail.as_view(), name="phone-detail"),
+    path("<slug:slug>-<int:n>/", views.PhoneDetail.as_view(), name="phone-detail"),
 ]

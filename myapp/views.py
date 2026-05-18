@@ -1,9 +1,10 @@
 import time
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.core.paginator import Paginator
 from django.conf import settings
 from django.http import HttpResponse
 from django.views import View
+from django.utils.text import slugify
 from .models import PhoneSpec, NoPhone
 from .utils import save_phone_spec
 
@@ -249,8 +250,13 @@ class PhoneDetail(View):
                 cleaned.append({"title": section["title"], "rows": rows})
         return cleaned
 
-    def get(self, request,n):
+    def get(self, request, slug, n):
         phone = get_object_or_404(PhoneSpec, number=n)
+        correct_slug = slugify(phone.title).replace("-", "_")
+        # SEO redirect if slug is wrong
+        if slug != correct_slug:
+            return redirect("phone-detail",slug=correct_slug, n=n,permanent=True)
+
         sect = self.build_spec_sections(phone)
         return render(request,"phone.html",{"phone": phone,"spec_sections": sect})
         

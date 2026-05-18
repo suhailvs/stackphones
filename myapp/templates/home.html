@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Phone Search{% endblock %}
+{% block title %}Stack Phones - Phone Search{% endblock %}
 
 {% block styles %}
 <style>
@@ -166,7 +166,7 @@
   <div class="row g-4">
     {% for phone in results %}
     <div class="col-sm-6 col-lg-4 col-xl-3">
-      <a class="text-decoration-none" href="/{{ phone.number }}/">
+      <a class="text-decoration-none" href="{{ phone.get_absolute_url }}">
         <div class="phone-card h-100">
           {% if phone.image %}
           <img
@@ -255,11 +255,12 @@
     </ul>
   </nav>
   {% endif %}
-
+  {% if request.user.is_authenticated %}
   <div class="text-center text-muted small mt-5">
     <a class="text-muted" href="/parse/">parse scrapped pages</a>
     <span class="mx-2">|</span>
     <a class="text-muted" href="/download/">image download</a>
   </div>
+  {% endif %}
 </div>
 {% endblock %}

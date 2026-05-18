@@ -1,4 +1,6 @@
 from django.db import models
+from django.urls import reverse
+from django.utils.text import slugify
 
 class PhoneSpec(models.Model):
     number = models.IntegerField(unique=True)
@@ -84,6 +86,10 @@ class PhoneSpec(models.Model):
     def __str__(self):
         return f"{self.chipset} - {self.announced}"
 
+    def get_absolute_url(self):
+        slug = slugify(self.title).replace("-", "_")
+        return reverse("phone-detail",kwargs={"slug": slug,"n": self.number})
+    
 class NoPhone(models.Model):
     number = models.IntegerField(unique=True)
     error = models.TextField()

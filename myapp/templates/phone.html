@@ -1,15 +1,31 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Phone Spec #{{ phone.title }}{% endblock %}
+{% block title %}{{ phone.title }} - Full phone Specifications, Price in India & Features{% endblock %}
 
 {% block styles %}
-  <!--
-    <meta content="Spice Smart Flo 359 (Mi-359) Android smartphone. Announced Aug 2014. Features 3.5″  display, MT6571 chipset, 2 MP primary camera, 1.3 MP front camera, 1400 mAh battery, 512 MB storage, 256 MB RAM." name="Description"/>
-    <meta content="Spice Smart Flo 359 (Mi-359),Spice,Smart Flo 359 (Mi-359),GSM,mobile,phone,cellphone,information,info,specs,specification,opinion,review" name="keywords"/>
-    <link href="https://www.gsmarena.com/spice_smart_flo_359_(mi_359)-7000.php" rel="canonical"/>
-    <link href="https://m.gsmarena.com/spice_smart_flo_359_(mi_359)-7000.php" media="only screen and (max-width: 640px)" rel="alternate"/>
-    -->
+  <meta name="description"
+        content="{{ phone.title }} smartphone with {{ phone.display_size }}, {{ phone.chipset }}, {{ phone.internal_memory }}, {{ phone.main_camera_modules }}, {{ phone.battery_type }} battery and {{ phone.network_5g_bands|default:'4G support' }}. Check full specifications, features and latest price in India.">
+  <meta name="keywords"
+        content="{{ phone.title }}, {{ phone.title }} price in India, {{ phone.title }} specifications, {{ phone.title }} features, {{ phone.title }} review, {{ phone.chipset }}, {{ phone.display_size }}, {{ phone.internal_memory }}, {{ phone.main_camera_modules }}, {{ phone.battery_type }}, {{ phone.os }}, 5G mobile">
+  <meta property="og:title"
+        content="{{ phone.title }} Price, Specifications & Features">
+  <meta property="og:description"
+        content="Check {{ phone.title }} full specifications including display, processor, camera, battery, RAM, storage and latest price in India.">
+  <meta property="og:type" content="website">
+  <meta property="og:url"
+        content="{{ request.build_absolute_uri }}">
+  <meta property="og:image"
+        content="{{ request.scheme }}://{{ request.get_host }}{% static 'media/' %}{{ phone.number }}.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title"
+        content="{{ phone.title }} Specifications & Price">
+  <meta name="twitter:description"
+        content="Full details of {{ phone.title }} including camera, battery, processor, display and storage specifications.">
+  <meta name="twitter:image"
+        content="{{ request.scheme }}://{{ request.get_host }}{% static 'media/' %}{{ phone.number }}.jpg">
+  <link rel="canonical"
+        href="{{ request.build_absolute_uri }}">
   <style>
   body {
     background: #f5f6f8;
@@ -96,6 +112,22 @@
   </div>
   {% endfor %}
 
-  <div class="text-center text-muted small mt-4">Phone Specs Database</div>
+  <div class="text-center text-muted small mt-4">scrapped from gsmarena.com</div>
 </div>
+{% endblock %}
+
+{% block js %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "{{ phone.title|escapejs }}",
+  "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'media/' %}{{ phone.number }}.jpg",
+  "description": "{{ phone.title|escapejs }} with {{ phone.display_size|escapejs }}, {{ phone.chipset|escapejs }}, {{ phone.battery_type|escapejs }} battery.",
+  "brand": {
+    "@type": "Brand",
+    "name": "{{ phone.title|cut:' '|truncatechars:20|escapejs }}"
+  }
+}
+</script>
 {% endblock %}
