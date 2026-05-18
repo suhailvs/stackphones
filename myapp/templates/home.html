@@ -255,12 +255,12 @@
     </ul>
   </nav>
   {% endif %}
-  {% if request.user.is_authenticated %}
+  {# if request.user.is_authenticated #}
   <div class="text-center text-muted small mt-5">
     <a class="text-muted" href="/parse/">parse scrapped pages</a>
     <span class="mx-2">|</span>
     <a class="text-muted" href="/download/">image download</a>
   </div>
-  {% endif %}
+  {# endif #}
 </div>
 {% endblock %}

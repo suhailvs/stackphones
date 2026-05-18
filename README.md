@@ -1,5 +1,12 @@
 # Stack Phones
 
+## Add New Phones
+
+on local:
+1. scrap: update **START** and **END** in `t.py`, then run: `python t.py`
+2. update db: update **TOTAL_PHONES** in `views.py`, then click `parse scrapped pages` then click `image download`
+3. move those images and scraped_pages to stackschools_datas
+
 ### Setup
 
 ```bash

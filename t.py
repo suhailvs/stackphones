@@ -90,14 +90,15 @@ def scrape(url: str, output_path: str, session: requests.Session, retries: int =
 
 def main():
     URL = "https://www.gsmarena.com/"
-    END = 14_501 - 1
-    START = 14_600 # 14_000
+    
+    START = 14_673 # 14_673
+    END = 14_674
     
     session = requests.Session()
     session.headers.update(HEADERS)
     results = {"ok": 0, "fail": 0}
-    for i in range(START,END,-1):
-        print(f"\n[{i}/{END+1}]")
+    for i in range(START,END+1):
+        print(f"\n[{i}/{END}]")
         out_path = os.path.join(DEFAULT_OUTPUT_DIR, f"{i}.html")
         if scrape(f"{URL}a-{i}.php", out_path, session, retries=5):
             results["ok"] += 1

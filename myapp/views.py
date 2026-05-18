@@ -8,7 +8,7 @@ from django.utils.text import slugify
 from .models import PhoneSpec, NoPhone
 from .utils import save_phone_spec
 
-TOTAL_PHONES = 14_591+1
+TOTAL_PHONES = 14_673
 def home(request):
     # print(PhoneSpec.objects.count(),NoPhone.objects.count())
     # print([n.number for n in NoPhone.objects.all()])
@@ -37,42 +37,51 @@ def home(request):
     )
 
 def download_images(request):
-    import os,requests
-    for i in range(1,TOTAL_PHONES):
-        url = PhoneSpec.objects.filter(number=i).first()
-        if not url:
+    import requests
+    image_dir = settings.BASE_DIR / "scraped_pages" / "images"
+    # image_dir.mkdir(parents=True, exist_ok=True)
+    downloaded = skipped = failed = no_phone = 0
+    for i in range(1,TOTAL_PHONES+1):
+        filename = image_dir / f"{i}.jpg"
+        if filename.exists():
+            skipped += 1
             continue
-        filename = os.path.join("scraped_pages","images", f"{i}.jpg")
-        if os.path.exists(filename):
-            # print(f"File exists:{i}")
+        phone = PhoneSpec.objects.filter(number=i).first()
+        if not phone:
+            no_phone += 1
+            continue
+        if not phone.image:
+            failed += 1
+            print(f"No image URL for {phone.number}")
             continue
         try:
-            response = requests.get(url.image, stream=True)
+            response = requests.get(phone.image,stream=True)
+            if response.status_code == 200:
+                with open(filename, "wb") as f:
+                    for chunk in response.iter_content(1024):
+                        if chunk:
+                            f.write(chunk)
+                downloaded += 1
+                print(f"Downloaded: {filename}")
+            else:
+                failed += 1
+                print(f"Failed to download {phone.number}")
         except Exception as e:
-            print(f'Request error at number {i}:{e}')
-            continue
-        
-        if response.status_code == 200:
-            with open(filename, 'wb') as f:
-                for chunk in response.iter_content(1024):
-                    f.write(chunk)
-            print("Downloaded:", filename)
-        else:
-            print(f"Failed to download:{i}")
-            continue
-    return HttpResponse('completed')
+            failed += 1
+            print(f"Request error at {phone.number}: {e}")
+    return HttpResponse(f"Completed. Downloaded={downloaded}, Skipped={skipped}, Failed={failed}, No Phone: {no_phone}")
 
 def parse(request):
     start = time.perf_counter()
-    NoPhone.objects.all().delete()
+    NoPhone.objects.all().delete() # if NoPhone uncommeted it will take about
     FD = settings.BASE_DIR / 'scraped_pages'
     phonespec_list = []
     nophone_list = []
-
+    created_phone_count = 0
     existing_numbers = set(PhoneSpec.objects.values_list("number", flat=True))
     existing_numbers.update(NoPhone.objects.values_list("number", flat=True))
 
-    for i in range(1, TOTAL_PHONES):
+    for i in range(1, TOTAL_PHONES+1):
         if i in existing_numbers:
             continue
         path = FD / f"{i}.html"
@@ -92,14 +101,20 @@ def parse(request):
         phonespec_list.append(PhoneSpec(number=i, **data,))
         if i%500==0:
             print('going to bulk create at ',i)
-            NoPhone.objects.bulk_create(nophone_list)
-            PhoneSpec.objects.bulk_create(phonespec_list)
+            if nophone_list:NoPhone.objects.bulk_create(nophone_list)
+            if phonespec_list:
+                before = PhoneSpec.objects.count()
+                PhoneSpec.objects.bulk_create(phonespec_list)
+                created_phone_count += PhoneSpec.objects.count() - before
             phonespec_list.clear()
             nophone_list.clear()          
             print('-')
-    NoPhone.objects.bulk_create(nophone_list)
-    PhoneSpec.objects.bulk_create(phonespec_list)
-    return HttpResponse(f"Time taken: {time.perf_counter() - start:.6f} seconds")
+    if nophone_list:NoPhone.objects.bulk_create(nophone_list)
+    if phonespec_list:
+        before = PhoneSpec.objects.count()
+        PhoneSpec.objects.bulk_create(phonespec_list)
+        created_phone_count += PhoneSpec.objects.count() - before
+    return HttpResponse(f"Time taken: {time.perf_counter() - start:.2f} seconds<br>PhoneSpec created: {created_phone_count}")
 
 
 class PhoneDetail(View):

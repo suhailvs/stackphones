@@ -2,9 +2,8 @@
 {% load static %}
 
 {% block title %}{{ phone.title }} - Full phone Specifications, Price in India & Features{% endblock %}
-
-{% block styles %}
-  <meta name="description"
+{% block meta %}
+<meta name="description"
         content="{{ phone.title }} smartphone with {{ phone.display_size }}, {{ phone.chipset }}, {{ phone.internal_memory }}, {{ phone.main_camera_modules }}, {{ phone.battery_type }} battery and {{ phone.network_5g_bands|default:'4G support' }}. Check full specifications, features and latest price in India.">
   <meta name="keywords"
         content="{{ phone.title }}, {{ phone.title }} price in India, {{ phone.title }} specifications, {{ phone.title }} features, {{ phone.title }} review, {{ phone.chipset }}, {{ phone.display_size }}, {{ phone.internal_memory }}, {{ phone.main_camera_modules }}, {{ phone.battery_type }}, {{ phone.os }}, 5G mobile">
@@ -26,6 +25,9 @@
         content="{{ request.scheme }}://{{ request.get_host }}{% static 'media/' %}{{ phone.number }}.jpg">
   <link rel="canonical"
         href="{{ request.build_absolute_uri }}">
+{% endblock %}
+{% block styles %}
+  
   <style>
   body {
     background: #f5f6f8;
